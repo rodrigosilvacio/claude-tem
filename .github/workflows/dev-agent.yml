@@ -10,10 +10,6 @@ on:
         description: Número da issue
         required: true
 
-concurrency:
-  group: agent-issue-${{ github.event.issue.number || inputs.issue_number }}
-  cancel-in-progress: false
-
 permissions:
   contents: write
   issues: write
@@ -33,6 +29,10 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       github.event.label.name == 'agent:todo' ||
       github.event.label.name == 'agent:changes'
+    # Trava no nível do job: execuções "skipped" não entram na fila e não cancelam a execução real
+    concurrency:
+      group: agent-issue-${{ github.event.issue.number || inputs.issue_number }}
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
