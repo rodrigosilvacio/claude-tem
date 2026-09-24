@@ -1,0 +1,156 @@
+name: Agente Revisor
+run-name: "Revisão #${{ github.event.issue.number || inputs.issue_number }}"
+
+on:
+  issues:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Número da issue
+        required: true
+
+concurrency:
+  group: agent-issue-${{ github.event.issue.number || inputs.issue_number }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+
+env:
+  ISSUE: ${{ github.event.issue.number || inputs.issue_number }}
+  BRANCH: claude/issue-${{ github.event.issue.number || inputs.issue_number }}
+
+jobs:
+  review:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.label.name == 'agent:review'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Localizar PR e preparar branch
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          source scripts/agent-state.sh
+          if ! check_author "$ISSUE"; then
+            echo "BLOCK_REASON=autor da issue sem permissão para acionar os agentes." >> "$GITHUB_ENV"
+            exit 1
+          fi
+          pr=$(gh pr list --head "$BRANCH" --state open --json number -q '.[0].number')
+          if [[ -z "$pr" ]]; then
+            echo "BLOCK_REASON=nenhum PR aberto encontrado para a branch \`$BRANCH\`." >> "$GITHUB_ENV"
+            exit 1
+          fi
+          echo "number=$pr" >> "$GITHUB_OUTPUT"
+          git fetch origin "$BRANCH"
+          git checkout -B "$BRANCH" "origin/$BRANCH"
+          if [ -f package-lock.json ]; then npm ci; fi
+          mkdir -p .agent
+
+      - name: Montar prompt
+        id: ctx
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ steps.pr.outputs.number }}
+        run: |
+          source scripts/agent-state.sh
+          round=$(get_round "$ISSUE")
+          {
+            cat .github/prompts/review.md
+            echo
+            echo "---"
+            gh issue view "$ISSUE" --json number,title,body \
+              -q '"## Issue #\(.number): \(.title)\n\n\(.body // "(sem descrição)")"'
+            echo
+            echo "## Pull Request #$PR — rodada $round (0 = primeira entrega)"
+            gh pr view "$PR" --json body -q .body
+            if [[ "$round" -gt 0 ]]; then
+              echo
+              echo "## Revisão anterior"
+              gh pr view "$PR" --json comments \
+                -q '[.comments[] | select(.body | contains("<!-- agent-review -->"))] | last | .body'
+            fi
+          } > "$RUNNER_TEMP/prompt.md"
+          {
+            echo "prompt<<__PROMPT_EOF__"
+            cat "$RUNNER_TEMP/prompt.md"
+            echo "__PROMPT_EOF__"
+          } >> "$GITHUB_OUTPUT"
+          echo "round=$round" >> "$GITHUB_OUTPUT"
+
+      - name: Agente Revisor (Claude)
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.AGENT_PAT }}
+          prompt: ${{ steps.ctx.outputs.prompt }}
+          claude_args: >-
+            --max-turns 40
+            --allowedTools "Read,Glob,Grep,Write,Bash(npm test:*),Bash(npm run typecheck:*),Bash(npm run build:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(ls:*),Bash(mkdir:*)"
+
+      - name: Aplicar veredito
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ steps.pr.outputs.number }}
+          ROUND: ${{ steps.ctx.outputs.round }}
+          AGENT_PAT: ${{ secrets.AGENT_PAT }}
+        run: |
+          source scripts/agent-state.sh
+          review=".agent/review.json"
+          if ! jq -e '.verdict == "approved" or .verdict == "changes_requested"' "$review" >/dev/null 2>&1; then
+            echo "BLOCK_REASON=o Agente Revisor não gerou um veredito válido em .agent/review.json." >> "$GITHUB_ENV"
+            exit 1
+          fi
+          verdict=$(jq -r .verdict "$review")
+
+          # Comentário da revisão no PR (o marcador permite ao Dev localizar o feedback)
+          {
+            echo "<!-- agent-review -->"
+            if [[ "$verdict" == "approved" ]]; then echo "## ✅ Revisão aprovada"; else echo "## ❌ Ajustes solicitados (rodada $((ROUND + 1)) de $MAX_ROUNDS)"; fi
+            echo
+            jq -r .summary "$review"
+            jq -r 'if (.issues // []) | length > 0 then "\n### Problemas que bloqueiam a aprovação\n" + ([.issues[] | "- **[\(.severity)]** `\(.file // "-")` — \(.description)"] | join("\n")) else empty end' "$review"
+            jq -r 'if (.suggestions // []) | length > 0 then "\n### Sugestões\n" + ([.suggestions[] | "- \(.)"] | join("\n")) else empty end' "$review"
+            echo
+            echo "---"
+            echo "🤖 Agente Revisor · [execução](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+          } > "$RUNNER_TEMP/comment.md"
+          gh pr comment "$PR" --body-file "$RUNNER_TEMP/comment.md"
+
+          if [[ "$verdict" == "approved" ]]; then
+            git reset --hard -q && git clean -fdq   # descarta qualquer alteração local do Revisor
+            GH_TOKEN="$AGENT_PAT" gh pr merge "$PR" --squash --delete-branch
+            set_state "$ISSUE" agent:merged
+            gh issue close "$ISSUE" --comment "✅ Implementado, revisado e mergeado via #$PR." || true
+          else
+            next=$((ROUND + 1))
+            if [[ "$next" -gt "$MAX_ROUNDS" ]]; then
+              block "$ISSUE" "o Revisor reprovou a entrega após $MAX_ROUNDS rodadas de ajustes. Veja o PR #$PR."
+            else
+              set_round "$ISSUE" "$next"
+              # Transição com o PAT: dispara novamente o workflow do Agente Dev
+              GH_TOKEN="$AGENT_PAT" set_state "$ISSUE" agent:changes
+            fi
+          fi
+
+      - name: Bloquear em caso de falha
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          source scripts/agent-state.sh
+          block "$ISSUE" "${BLOCK_REASON:-o workflow do Agente Revisor falhou.} [Ver execução](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"

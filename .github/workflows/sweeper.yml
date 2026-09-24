@@ -1,0 +1,40 @@
+name: Sweeper de demandas
+# Polling de segurança: recupera demandas paradas (evento perdido, runner cancelado etc.)
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  issues: read
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Re-disparar demandas paradas
+        env:
+          # Dispara com o PAT: o claude-code-action recusa execuções iniciadas por bots
+          GH_TOKEN: ${{ secrets.AGENT_PAT }}
+          GH_REPO: ${{ github.repository }}
+          STALE_MINUTES: 20
+        run: |
+          set -euo pipefail
+          # Títulos das execuções ativas ("Dev #12", "Revisão #12")
+          active=$(for s in queued in_progress waiting pending; do
+            gh run list --status "$s" --limit 100 --json displayTitle -q '.[].displayTitle'
+          done)
+          cutoff=$(date -u -d "-$STALE_MINUTES minutes" +%Y-%m-%dT%H:%M:%SZ)
+
+          for label in agent:todo agent:dev agent:changes agent:review; do
+            gh issue list --state open --label "$label" --limit 100 --json number,updatedAt \
+              -q ".[] | select(.updatedAt < \"$cutoff\") | .number" |
+            while read -r n; do
+              if grep -qE "(Dev|Revisão) #$n\$" <<<"$active"; then continue; fi
+              if [[ "$label" == "agent:review" ]]; then wf=review-agent.yml; else wf=dev-agent.yml; fi
+              echo "Issue #$n parada em $label → disparando $wf"
+              gh workflow run "$wf" -f issue_number="$n"
+            done
+          done

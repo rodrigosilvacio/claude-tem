@@ -1,0 +1,16 @@
+{
+  "name": "claude-tem",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Projeto desenvolvido pelos agentes Claude (Dev + Revisor) a partir de issues do GitHub",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

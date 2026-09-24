@@ -1,0 +1,168 @@
+name: Agente Dev
+run-name: "Dev #${{ github.event.issue.number || inputs.issue_number }}"
+
+on:
+  issues:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Número da issue
+        required: true
+
+concurrency:
+  group: agent-issue-${{ github.event.issue.number || inputs.issue_number }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+
+env:
+  ISSUE: ${{ github.event.issue.number || inputs.issue_number }}
+  BRANCH: claude/issue-${{ github.event.issue.number || inputs.issue_number }}
+
+jobs:
+  dev:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.label.name == 'agent:todo' ||
+      github.event.label.name == 'agent:changes'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.AGENT_PAT }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validar autor e iniciar demanda
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          source scripts/agent-state.sh
+          if ! check_author "$ISSUE"; then
+            echo "BLOCK_REASON=autor da issue sem permissão para acionar os agentes." >> "$GITHUB_ENV"
+            exit 1
+          fi
+          labels=$(gh issue view "$ISSUE" --json labels -q '[.labels[].name] | join(",")')
+          # Nova demanda (agent:todo) recomeça a contagem de rodadas
+          if [[ ",$labels," == *",agent:todo,"* ]]; then set_round "$ISSUE" 0; fi
+          set_state "$ISSUE" agent:dev
+
+      - name: Preparar branch
+        run: |
+          git config user.name "claude-dev-agent"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null; then
+            git fetch origin "$BRANCH"
+            git checkout -B "$BRANCH" "origin/$BRANCH"
+            # Mantém a branch atualizada com a main (melhor esforço)
+            git merge --no-edit origin/main || git merge --abort
+          else
+            git checkout -b "$BRANCH"
+          fi
+          if [ -f package-lock.json ]; then npm ci; fi
+          mkdir -p .agent
+
+      - name: Montar prompt
+        id: ctx
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          source scripts/agent-state.sh
+          round=$(get_round "$ISSUE")
+          {
+            cat .github/prompts/dev.md
+            echo
+            echo "---"
+            gh issue view "$ISSUE" --json number,title,body \
+              -q '"## Issue #\(.number): \(.title)\n\n\(.body // "(sem descrição)")"'
+            echo
+            if [[ "$round" -gt 0 ]]; then
+              echo "## Retrabalho — rodada $round de $MAX_ROUNDS"
+              echo "O Revisor reprovou a entrega anterior. Feedback mais recente:"
+              echo
+              pr=$(gh pr list --head "$BRANCH" --state open --json number -q '.[0].number')
+              if [[ -n "$pr" ]]; then
+                gh pr view "$pr" --json comments \
+                  -q '[.comments[] | select(.body | contains("<!-- agent-review -->"))] | last | .body'
+              fi
+            fi
+          } > "$RUNNER_TEMP/prompt.md"
+          {
+            echo "prompt<<__PROMPT_EOF__"
+            cat "$RUNNER_TEMP/prompt.md"
+            echo "__PROMPT_EOF__"
+          } >> "$GITHUB_OUTPUT"
+          echo "round=$round" >> "$GITHUB_OUTPUT"
+
+      - name: Agente Dev (Claude)
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.AGENT_PAT }}
+          prompt: ${{ steps.ctx.outputs.prompt }}
+          claude_args: >-
+            --max-turns 80
+            --allowedTools "Read,Write,Edit,MultiEdit,Glob,Grep,Bash(npm:*),Bash(npx:*),Bash(node:*),Bash(ls:*),Bash(mkdir:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*)"
+
+      - name: Commit, push e PR
+        env:
+          GH_TOKEN: ${{ secrets.AGENT_PAT }}
+          ROUND: ${{ steps.ctx.outputs.round }}
+        run: |
+          source scripts/agent-state.sh
+          summary=".agent/summary.md"
+          if grep -q '^BLOQUEADO:' "$summary" 2>/dev/null; then
+            GH_TOKEN=${{ github.token }} block "$ISSUE" "o Agente Dev não conseguiu prosseguir.
+
+          $(cat "$summary")"
+            exit 0
+          fi
+
+          # Infraestrutura do pipeline não pode ser alterada pelo agente
+          git checkout HEAD -- .github dashboard scripts 2>/dev/null || true
+          git clean -fdq -- .github dashboard scripts
+
+          git add -A
+          if git diff --cached --quiet; then
+            GH_TOKEN=${{ github.token }} block "$ISSUE" "o Agente Dev terminou sem produzir alterações."
+            exit 0
+          fi
+          title=$(gh issue view "$ISSUE" --json title -q .title)
+          if [[ "$ROUND" -gt 0 ]]; then msg="fix: ajustes da revisão (rodada $ROUND) — #$ISSUE"; else msg="feat: $title (#$ISSUE)"; fi
+          git commit -q -m "$msg"
+          git push -u origin "$BRANCH"
+
+          body="Closes #$ISSUE
+
+          $(cat "$summary" 2>/dev/null || echo '_(sem resumo)_')
+
+          ---
+          🤖 Gerado pelo Agente Dev"
+          pr=$(gh pr list --head "$BRANCH" --state open --json number -q '.[0].number')
+          if [[ -z "$pr" ]]; then
+            gh pr create --base main --head "$BRANCH" --title "$title (#$ISSUE)" --body "$body"
+          else
+            gh pr comment "$pr" --body "🔁 **Agente Dev — rodada $ROUND**
+
+          $(cat "$summary" 2>/dev/null || echo '_(sem resumo)_')"
+          fi
+
+          # Transição com o PAT: dispara o workflow do Agente Revisor
+          set_state "$ISSUE" agent:review
+
+      - name: Bloquear em caso de falha
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          source scripts/agent-state.sh
+          block "$ISSUE" "${BLOCK_REASON:-o workflow do Agente Dev falhou.} [Ver execução](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
