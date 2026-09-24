@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 2rem 1rem;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        background: #f3f4f6;
+        color: #111827;
+      }
+
+      .dashboard {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .dashboard h1 {
+        margin: 0 0 0.25rem;
+        font-size: 1.75rem;
+      }
+
+      .subtitle {
+        margin: 0 0 1.5rem;
+        color: #6b7280;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .stat-card,
+      .panel {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      }
+
+      .stat-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        padding: 1rem 1.25rem;
+      }
+
+      .stat-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+
+      .stat-value {
+        font-size: 1.75rem;
+      }
+
+      .panel {
+        padding: 1.5rem;
+        overflow-x: auto;
+      }
+
+      .panel h2 {
+        margin: 0 0 1rem;
+        font-size: 1.25rem;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9375rem;
+      }
+
+      th,
+      td {
+        padding: 0.625rem 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+        white-space: nowrap;
+      }
+
+      th {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+      }
+
+      .password {
+        font-family: ui-monospace, monospace;
+        letter-spacing: 0.1em;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 0.125rem 0.5rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        border-radius: 999px;
+      }
+
+      .badge-active {
+        color: #166534;
+        background: #dcfce7;
+      }
+
+      .badge-inactive {
+        color: #374151;
+        background: #e5e7eb;
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 1rem 0.5rem;
+        }
+
+        .panel {
+          padding: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="dashboard">
+      <h1>Dashboard</h1>
+      <p class="subtitle">Dados fictícios de usuários para demonstração.</p>
+      <section class="stats" aria-label="Resumo">
+        <div class="stat-card">
+          <span class="stat-label">Total de usuários</span>
+          <strong class="stat-value">5</strong>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Ativos</span>
+          <strong class="stat-value">4</strong>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Inativos</span>
+          <strong class="stat-value">1</strong>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Administradores</span>
+          <strong class="stat-value">1</strong>
+        </div>
+      </section>
+      <section class="panel">
+        <h2>Usuários</h2>
+        <table id="users-table">
+          <thead>
+            <tr>
+              <th scope="col">Nome</th>
+              <th scope="col">E-mail</th>
+              <th scope="col">Senha</th>
+              <th scope="col">Perfil</th>
+              <th scope="col">Status</th>
+              <th scope="col">Último acesso</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Ana Souza</td>
+              <td>ana.souza@example.com</td>
+              <td class="password">••••••••</td>
+              <td>Administrador</td>
+              <td><span class="badge badge-active">Ativo</span></td>
+              <td>24/09/2026 09:15</td>
+            </tr>
+            <tr>
+              <td>Bruno Lima</td>
+              <td>bruno.lima@example.com</td>
+              <td class="password">••••••••</td>
+              <td>Editor</td>
+              <td><span class="badge badge-active">Ativo</span></td>
+              <td>23/09/2026 17:42</td>
+            </tr>
+            <tr>
+              <td>Carla Mendes</td>
+              <td>carla.mendes@example.com</td>
+              <td class="password">••••••••</td>
+              <td>Leitor</td>
+              <td><span class="badge badge-inactive">Inativo</span></td>
+              <td>30/08/2026 11:05</td>
+            </tr>
+            <tr>
+              <td>Diego Rocha</td>
+              <td>diego.rocha@example.com</td>
+              <td class="password">••••••••</td>
+              <td>Editor</td>
+              <td><span class="badge badge-active">Ativo</span></td>
+              <td>22/09/2026 08:30</td>
+            </tr>
+            <tr>
+              <td>Elisa Martins</td>
+              <td>elisa.martins@example.com</td>
+              <td class="password">••••••••</td>
+              <td>Leitor</td>
+              <td><span class="badge badge-active">Ativo</span></td>
+              <td>20/09/2026 14:10</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>
