@@ -1,0 +1,71 @@
+name: Publicar dashboard
+run-name: "Dashboard (${{ github.event_name }})"
+# Gera board.json com o estado atual das demandas e publica o kanban no GitHub Pages.
+
+on:
+  issues:
+    types: [labeled, unlabeled, closed, reopened, edited]
+  # Início e fim das execuções dos agentes (inclui transições feitas com o GITHUB_TOKEN,
+  # que não disparam o evento "issues")
+  workflow_run:
+    workflows: [Agente Dev, Agente Revisor]
+    types: [in_progress, completed]
+  push:
+    branches: [main]
+    paths: [dashboard/**]
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+  actions: read
+  pages: write
+  id-token: write
+
+# Vários eventos em sequência: só a publicação mais recente importa
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    # Ignora as execuções "skipped" (troca de label que não se aplica ao workflow)
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion != 'skipped'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    defaults:
+      run:
+        working-directory: dashboard
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: dashboard/package-lock.json
+
+      - run: npm ci
+
+      - name: Build do front (modo estático)
+        env:
+          VITE_STATIC: "true"
+        run: npm run build -w web
+
+      - name: Gerar board.json
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPO: ${{ github.repository }}
+        run: npm run snapshot -w server -- ../web/dist/board.json
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dashboard/web/dist
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

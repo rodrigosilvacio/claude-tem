@@ -18,6 +18,7 @@ agent:todo ─▶ agent:dev ─▶ agent:review ─┬─ aprovado ─▶ agent:
 | Sweeper | `.github/workflows/sweeper.yml` | Polling a cada 10 min: re-dispara demandas paradas há mais de 20 min sem execução ativa. |
 | Estado | `scripts/agent-state.sh` | Labels `agent:*` (etapa) e `round:N` (rodada de ajustes) na issue. O GitHub é a fonte da verdade. |
 | Kanban no GitHub | `scripts/setup-project.sh` + `.github/workflows/project-sync.yml` | GitHub Project cujas colunas (Status) e campo Rodada são atualizados a cada transição. |
+| Dashboard no GitHub Pages | `.github/workflows/dashboard-pages.yml` | Gera `board.json` a cada mudança e publica o dashboard em https://rodrigosilvacio.github.io/claude-tem/ |
 | Kanban local (opcional) | `dashboard/` | Servidor Node que consulta a API do GitHub (polling de 15 s) e envia o quadro via SSE para o front React. |
 
 Só issues de `OWNER`, `MEMBER` ou `COLLABORATOR` acionam os agentes. O Dev não pode alterar `.github/`,
@@ -77,6 +78,14 @@ Se houver *branch protection* na `main`, o dono do `AGENT_PAT` precisa poder faz
 4. Demanda bloqueada: ajuste a issue e aplique `agent:todo` de novo (a contagem de rodadas recomeça).
 
 > Toda troca de label dispara os workflows; as execuções que não se aplicam aparecem como *skipped* na aba Actions.
+
+## Dashboard no GitHub Pages
+Endereço: **https://rodrigosilvacio.github.io/claude-tem/**
+
+O workflow `Publicar dashboard` roda a cada mudança de label, no início e no fim de cada execução dos agentes, e
+também a cada 15 min. Ele gera um retrato (`board.json`) com os dados do GitHub e publica a página estática, que
+recarrega esses dados a cada 30 s. Nenhum token fica exposto na página. Cada atualização leva cerca de 1 min para
+aparecer, e a página é pública, como o repositório.
 
 ## Dashboard local (opcional)
 Mais detalhado que o Project: mostra o status da execução, os tempos por etapa e o passo a passo de cada demanda.

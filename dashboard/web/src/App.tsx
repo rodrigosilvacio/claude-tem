@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Column } from "../../server/src/types";
 import { CardView } from "./Card";
+import { since } from "./time";
 import { useBoard } from "./useBoard";
 
 export const COLUMNS: { id: Column; title: string; hint: string }[] = [
@@ -13,7 +14,7 @@ export const COLUMNS: { id: Column; title: string; hint: string }[] = [
 ];
 
 export function App() {
-  const { board, connected } = useBoard();
+  const { board, connected, isStatic } = useBoard();
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000);
@@ -38,7 +39,9 @@ export function App() {
             {active} {active === 1 ? "agente trabalhando" : "agentes trabalhando"}
           </p>
         </div>
-        <span className={`conn ${connected ? "on" : "off"}`}>{connected ? "ao vivo" : "reconectando…"}</span>
+        <span className={`conn ${connected ? "on" : "off"}`}>
+          {!connected ? "reconectando…" : isStatic && board ? `atualizado há ${since(board.updatedAt, now)}` : "ao vivo"}
+        </span>
       </header>
 
       {board?.error && <div className="error">Erro ao consultar o GitHub: {board.error}</div>}
