@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Design System</title>
+    <link rel="stylesheet" href="design-system.css" />
+    <style>
+      /* Estilos exclusivos desta página de documentação. */
+      .ds-header {
+        padding: var(--space-8) var(--space-4);
+        color: #ffffff;
+        background: var(--color-primary-900);
+      }
+
+      .ds-header p {
+        margin: var(--space-2) 0 0;
+        color: var(--color-primary-200);
+      }
+
+      .ds-header h1 {
+        margin: 0;
+        font-size: var(--font-size-3xl);
+      }
+
+      .ds-container {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      main.ds-container {
+        padding: var(--space-8) var(--space-4) var(--space-12);
+      }
+
+      .ds-section + .ds-section {
+        margin-top: var(--space-12);
+      }
+
+      .ds-section > h2 {
+        margin: 0 0 var(--space-1);
+        font-size: var(--font-size-2xl);
+      }
+
+      .ds-section > p {
+        margin: 0 0 var(--space-6);
+        color: var(--color-text-muted);
+      }
+
+      .palette + .palette {
+        margin-top: var(--space-6);
+      }
+
+      .palette h3 {
+        margin: 0;
+        font-size: var(--font-size-lg);
+      }
+
+      .palette p {
+        margin: 0 0 var(--space-3);
+        font-size: var(--font-size-sm);
+        color: var(--color-text-muted);
+      }
+
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .swatch {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        gap: 0.125rem;
+        min-height: 88px;
+        padding: var(--space-2);
+        font-size: var(--font-size-xs);
+      }
+
+      .swatch-shade {
+        font-weight: 700;
+      }
+
+      .token-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: var(--font-size-sm);
+      }
+
+      .token-table th,
+      .token-table td {
+        padding: var(--space-2) var(--space-3);
+        text-align: left;
+        border-bottom: 1px solid var(--color-neutral-200);
+      }
+
+      .token-table th {
+        color: var(--color-text-muted);
+        font-weight: 600;
+      }
+
+      .token-dot {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        margin-right: var(--space-2);
+        vertical-align: middle;
+        border: 1px solid var(--color-neutral-200);
+        border-radius: var(--radius-full);
+      }
+
+      .type-scale > * {
+        margin: 0 0 var(--space-3);
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--space-6);
+      }
+
+      .stack {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+      }
+
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        align-items: center;
+      }
+
+      .space-bar {
+        height: 0.75rem;
+        background: var(--color-accent-500);
+        border-radius: var(--radius-sm);
+      }
+
+      @media (max-width: 640px) {
+        .swatches {
+          grid-template-columns: repeat(5, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="ds-header">
+      <div class="ds-container">
+        <h1>Design System</h1>
+        <p>Padrão visual corporativo: cores, paletas, tipografia e componentes base.</p>
+      </div>
+    </header>
+
+    <main class="ds-container">
+      <section class="ds-section" id="cores">
+        <h2>Paletas de cores</h2>
+        <p>Cada paleta tem 10 tons (50 a 900). Tons claros para fundos, médios para bordas e ícones, escuros para textos e ações.</p>
+
+        <section class="palette" id="palette-primary">
+          <h3>Primária (Azul corporativo)</h3>
+          <p>Cor da marca. Ações principais, links e elementos de destaque.</p>
+          <ul class="swatches">
+            <li class="swatch" style="background: var(--color-primary-50); color: #0f172a"><span class="swatch-shade">50</span><code>#eff4fb</code></li>
+            <li class="swatch" style="background: var(--color-primary-100); color: #0f172a"><span class="swatch-shade">100</span><code>#dbe5f5</code></li>
+            <li class="swatch" style="background: var(--color-primary-200); color: #0f172a"><span class="swatch-shade">200</span><code>#b7cbeb</code></li>
+            <li class="swatch" style="background: var(--color-primary-300); color: #0f172a"><span class="swatch-shade">300</span><code>#88a8dc</code></li>
+            <li class="swatch" style="background: var(--color-primary-400); color: #0f172a"><span class="swatch-shade">400</span><code>#5a82c8</code></li>
+            <li class="swatch" style="background: var(--color-primary-500); color: #ffffff"><span class="swatch-shade">500</span><code>#3763b0</code></li>
+            <li class="swatch" style="background: var(--color-primary-600); color: #ffffff"><span class="swatch-shade">600</span><code>#264d94</code></li>
+            <li class="swatch" style="background: var(--color-primary-700); color: #ffffff"><span class="swatch-shade">700</span><code>#1e3d78</code></li>
+            <li class="swatch" style="background: var(--color-primary-800); color: #ffffff"><span class="swatch-shade">800</span><code>#182f5e</code></li>
+            <li class="swatch" style="background: var(--color-primary-900); color: #ffffff"><span class="swatch-shade">900</span><code>#0f1f40</code></li>
+          </ul>
+        </section>
+
+        <section class="palette" id="palette-accent">
+          <h3>Destaque (Verde-azulado)</h3>
+          <p>Cor secundária para realces pontuais, gráficos e ilustrações.</p>
+          <ul class="swatches">
+            <li class="swatch" style="background: var(--color-accent-50); color: #0f172a"><span class="swatch-shade">50</span><code>#effcf9</code></li>
+            <li class="swatch" style="background: var(--color-accent-100); color: #0f172a"><span class="swatch-shade">100</span><code>#cff5ec</code></li>
+            <li class="swatch" style="background: var(--color-accent-200); color: #0f172a"><span class="swatch-shade">200</span><code>#9febd9</code></li>
+            <li class="swatch" style="background: var(--color-accent-300); color: #0f172a"><span class="swatch-shade">300</span><code>#67d9c2</code></li>
+            <li class="swatch" style="background: var(--color-accent-400); color: #0f172a"><span class="swatch-shade">400</span><code>#34bfa7</code></li>
+            <li class="swatch" style="background: var(--color-accent-500); color: #0f172a"><span class="swatch-shade">500</span><code>#1aa38c</code></li>
+            <li class="swatch" style="background: var(--color-accent-600); color: #ffffff"><span class="swatch-shade">600</span><code>#128372</code></li>
+            <li class="swatch" style="background: var(--color-accent-700); color: #ffffff"><span class="swatch-shade">700</span><code>#13695d</code></li>
+            <li class="swatch" style="background: var(--color-accent-800); color: #ffffff"><span class="swatch-shade">800</span><code>#14544c</code></li>
+            <li class="swatch" style="background: var(--color-accent-900); color: #ffffff"><span class="swatch-shade">900</span><code>#134640</code></li>
+          </ul>
+        </section>
+
+        <section class="palette" id="palette-neutral">
+          <h3>Neutra (Cinza-ardósia)</h3>
+          <p>Textos, fundos, bordas e superfícies.</p>
+          <ul class="swatches">
+            <li class="swatch" style="background: var(--color-neutral-50); color: #0f172a"><span class="swatch-shade">50</span><code>#f8fafc</code></li>
+            <li class="swatch" style="background: var(--color-neutral-100); color: #0f172a"><span class="swatch-shade">100</span><code>#f1f5f9</code></li>
+            <li class="swatch" style="background: var(--color-neutral-200); color: #0f172a"><span class="swatch-shade">200</span><code>#e2e8f0</code></li>
+            <li class="swatch" style="background: var(--color-neutral-300); color: #0f172a"><span class="swatch-shade">300</span><code>#cbd5e1</code></li>
+            <li class="swatch" style="background: var(--color-neutral-400); color: #0f172a"><span class="swatch-shade">400</span><code>#94a3b8</code></li>
+            <li class="swatch" style="background: var(--color-neutral-500); color: #ffffff"><span class="swatch-shade">500</span><code>#64748b</code></li>
+            <li class="swatch" style="background: var(--color-neutral-600); color: #ffffff"><span class="swatch-shade">600</span><code>#475569</code></li>
+            <li class="swatch" style="background: var(--color-neutral-700); color: #ffffff"><span class="swatch-shade">700</span><code>#334155</code></li>
+            <li class="swatch" style="background: var(--color-neutral-800); color: #ffffff"><span class="swatch-shade">800</span><code>#1e293b</code></li>
+            <li class="swatch" style="background: var(--color-neutral-900); color: #ffffff"><span class="swatch-shade">900</span><code>#0f172a</code></li>
+          </ul>
+        </section>
+
+        <section class="palette" id="palette-success">
+          <h3>Sucesso</h3>
+          <p>Confirmações e estados positivos.</p>
+          <ul class="swatches">
+            <li class="swatch" style="background: var(--color-success-50); color: #0f172a"><span class="swatch-shade">50</span><code>#f0fdf4</code></li>
+            <li class="swatch" style="background: var(--color-success-100); color: #0f172a"><span class="swatch-shade">100</span><code>#dcfce7</code></li>
+            <li class="swatch" style="background: var(--color-success-200); color: #0f172a"><span class="swatch-shade">200</span><code>#bbf7d0</code></li>
+            <li class="swatch" style="background: var(--color-success-300); color: #0f172a"><span class="swatch-shade">300</span><code>#86efac</code></li>
+            <li class="swatch" style="background: var(--color-success-400); color: #0f172a"><span class="swatch-shade">400</span><code>#4ade80</code></li>
+            <li class="swatch" style="background: var(--color-success-500); color: #0f172a"><span class="swatch-shade">500</span><code>#22c55e</code></li>
+            <li class="swatch" style="background: var(--color-success-600); color: #0f172a"><span class="swatch-shade">600</span><code>#16a34a</code></li>
+            <li class="swatch" style="background: var(--color-success-700); color: #ffffff"><span class="swatch-shade">700</span><code>#15803d</code></li>
+            <li class="swatch" style="background: var(--color-success-800); color: #ffffff"><span class="swatch-shade">800</span><code>#166534</code></li>
+            <li class="swatch" style="background: var(--color-success-900); color: #ffffff"><span class="swatch-shade">900</span><code>#14532d</code></li>
+          </ul>
+        </section>
+
+        <section class="palette" id="palette-warning">
+          <h3>Alerta</h3>
+          <p>Avisos que exigem atenção, sem bloquear o usuário.</p>
+          <ul class="swatches">
+            <li class="swatch" style="background: var(--color-warning-50); color: #0f172a"><span class="swatch-shade">50</span><code>#fffbeb</code></li>
+            <li class="swatch" style="background: var(--color-warning-100); color: #0f172a"><span class="swatch-shade">100</span><code>#fef3c7</code></li>
+            <li class="swatch" style="background: var(--color-warning-200); color: #0f172a"><span class="swatch-shade">200</span><code>#fde68a</code></li>
+            <li class="swatch" style="background: var(--color-warning-300); color: #0f172a"><span class="swatch-shade">300</span><code>#fcd34d</code></li>
+            <li class="swatch" style="background: var(--color-warning-400); color: #0f172a"><span class="swatch-shade">400</span><code>#fbbf24</code></li>
+            <li class="swatch" style="background: var(--color-warning-500); color: #0f172a"><span class="swatch-shade">500</span><code>#f59e0b</code></li>
+            <li class="swatch" style="background: var(--color-warning-600); color: #0f172a"><span class="swatch-shade">600</span><code>#d97706</code></li>
+            <li class="swatch" style="background: var(--color-warning-700); color: #ffffff"><span class="swatch-shade">700</span><code>#b45309</code></li>
+            <li class="swatch" style="background: var(--color-warning-800); color: #ffffff"><span class="swatch-shade">800</span><code>#92400e</code></li>
+            <li class="swatch" style="background: var(--color-warning-900); color: #ffffff"><span class="swatch-shade">900</span><code>#78350f</code></li>
+          </ul>
+        </section>
+
+        <section class="palette" id="palette-danger">
+          <h3>Erro</h3>
+          <p>Erros, ações destrutivas e validações.</p>
+          <ul class="swatches">
+            <li class="swatch" style="background: var(--color-danger-50); color: #0f172a"><span class="swatch-shade">50</span><code>#fef2f2</code></li>
+            <li class="swatch" style="background: var(--color-danger-100); color: #0f172a"><span class="swatch-shade">100</span><code>#fee2e2</code></li>
+            <li class="swatch" style="background: var(--color-danger-200); color: #0f172a"><span class="swatch-shade">200</span><code>#fecaca</code></li>
+            <li class="swatch" style="background: var(--color-danger-300); color: #0f172a"><span class="swatch-shade">300</span><code>#fca5a5</code></li>
+            <li class="swatch" style="background: var(--color-danger-400); color: #0f172a"><span class="swatch-shade">400</span><code>#f87171</code></li>
+            <li class="swatch" style="background: var(--color-danger-500); color: #0f172a"><span class="swatch-shade">500</span><code>#ef4444</code></li>
+            <li class="swatch" style="background: var(--color-danger-600); color: #ffffff"><span class="swatch-shade">600</span><code>#dc2626</code></li>
+            <li class="swatch" style="background: var(--color-danger-700); color: #ffffff"><span class="swatch-shade">700</span><code>#b91c1c</code></li>
+            <li class="swatch" style="background: var(--color-danger-800); color: #ffffff"><span class="swatch-shade">800</span><code>#991b1b</code></li>
+            <li class="swatch" style="background: var(--color-danger-900); color: #ffffff"><span class="swatch-shade">900</span><code>#7f1d1d</code></li>
+          </ul>
+        </section>
+
+        <section class="palette" id="palette-info">
+          <h3>Informação</h3>
+          <p>Mensagens informativas e dicas.</p>
+          <ul class="swatches">
+            <li class="swatch" style="background: var(--color-info-50); color: #0f172a"><span class="swatch-shade">50</span><code>#f0f9ff</code></li>
+            <li class="swatch" style="background: var(--color-info-100); color: #0f172a"><span class="swatch-shade">100</span><code>#e0f2fe</code></li>
+            <li class="swatch" style="background: var(--color-info-200); color: #0f172a"><span class="swatch-shade">200</span><code>#bae6fd</code></li>
+            <li class="swatch" style="background: var(--color-info-300); color: #0f172a"><span class="swatch-shade">300</span><code>#7dd3fc</code></li>
+            <li class="swatch" style="background: var(--color-info-400); color: #0f172a"><span class="swatch-shade">400</span><code>#38bdf8</code></li>
+            <li class="swatch" style="background: var(--color-info-500); color: #0f172a"><span class="swatch-shade">500</span><code>#0ea5e9</code></li>
+            <li class="swatch" style="background: var(--color-info-600); color: #0f172a"><span class="swatch-shade">600</span><code>#0284c7</code></li>
+            <li class="swatch" style="background: var(--color-info-700); color: #ffffff"><span class="swatch-shade">700</span><code>#0369a1</code></li>
+            <li class="swatch" style="background: var(--color-info-800); color: #ffffff"><span class="swatch-shade">800</span><code>#075985</code></li>
+            <li class="swatch" style="background: var(--color-info-900); color: #ffffff"><span class="swatch-shade">900</span><code>#0c4a6e</code></li>
+          </ul>
+        </section>
+      </section>
+
+      <section class="ds-section" id="tokens">
+        <h2>Cores semânticas</h2>
+        <p>Use sempre os tokens semânticos nos componentes; os tons diretos ficam para casos específicos.</p>
+        <div class="ds-card">
+          <table class="token-table">
+            <thead>
+              <tr>
+                <th>Token</th>
+                <th>Referência</th>
+                <th>Uso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="token-dot" style="background: var(--color-bg)"></span><code>--color-bg</code></td><td>neutral-50</td><td>Fundo da página</td></tr>
+              <tr><td><span class="token-dot" style="background: var(--color-surface)"></span><code>--color-surface</code></td><td>#ffffff</td><td>Cartões, modais e campos</td></tr>
+              <tr><td><span class="token-dot" style="background: var(--color-border)"></span><code>--color-border</code></td><td>neutral-300</td><td>Bordas e divisores</td></tr>
+              <tr><td><span class="token-dot" style="background: var(--color-text)"></span><code>--color-text</code></td><td>neutral-900</td><td>Texto principal</td></tr>
+              <tr><td><span class="token-dot" style="background: var(--color-text-muted)"></span><code>--color-text-muted</code></td><td>neutral-600</td><td>Texto secundário</td></tr>
+              <tr><td><span class="token-dot" style="background: var(--color-brand)"></span><code>--color-brand</code></td><td>primary-700</td><td>Ações principais e links</td></tr>
+              <tr><td><span class="token-dot" style="background: var(--color-focus)"></span><code>--color-focus</code></td><td>primary-500</td><td>Anel de foco</td></tr>
+              <tr><td><span class="token-dot" style="background: var(--color-accent)"></span><code>--color-accent</code></td><td>accent-700</td><td>Realces</td></tr>
+              <tr><td><span class="token-dot" style="background: var(--color-success)"></span><code>--color-success</code></td><td>success-700</td><td>Sucesso</td></tr>
+              <tr><td><span class="token-dot" style="background: var(--color-warning)"></span><code>--color-warning</code></td><td>warning-800</td><td>Alerta</td></tr>
+              <tr><td><span class="token-dot" style="background: var(--color-danger)"></span><code>--color-danger</code></td><td>danger-700</td><td>Erro</td></tr>
+              <tr><td><span class="token-dot" style="background: var(--color-info)"></span><code>--color-info</code></td><td>info-800</td><td>Informação</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="ds-section" id="tipografia">
+        <h2>Tipografia</h2>
+        <p>Fonte sem serifa (<code>--font-sans</code>) com escala de <code>--font-size-xs</code> a <code>--font-size-4xl</code>.</p>
+        <div class="ds-card type-scale">
+          <p style="font-size: var(--font-size-4xl); font-weight: 700">Título 4xl</p>
+          <p style="font-size: var(--font-size-3xl); font-weight: 700">Título 3xl</p>
+          <p style="font-size: var(--font-size-2xl); font-weight: 600">Título 2xl</p>
+          <p style="font-size: var(--font-size-xl); font-weight: 600">Subtítulo xl</p>
+          <p style="font-size: var(--font-size-md)">Texto padrão (md) — interfaces claras e objetivas.</p>
+          <p style="font-size: var(--font-size-sm); color: var(--color-text-muted)">Texto auxiliar (sm)</p>
+          <p style="font-size: var(--font-size-xs); color: var(--color-text-muted)">Legenda (xs)</p>
+        </div>
+      </section>
+
+      <section class="ds-section" id="espacamento">
+        <h2>Espaçamento</h2>
+        <p>Escala baseada em múltiplos de 4px (<code>--space-1</code> a <code>--space-12</code>).</p>
+        <div class="ds-card stack">
+          <div class="row"><code>--space-1</code><div class="space-bar" style="width: var(--space-1)"></div></div>
+          <div class="row"><code>--space-2</code><div class="space-bar" style="width: var(--space-2)"></div></div>
+          <div class="row"><code>--space-4</code><div class="space-bar" style="width: var(--space-4)"></div></div>
+          <div class="row"><code>--space-8</code><div class="space-bar" style="width: var(--space-8)"></div></div>
+          <div class="row"><code>--space-12</code><div class="space-bar" style="width: var(--space-12)"></div></div>
+        </div>
+      </section>
+
+      <section class="ds-section" id="componentes">
+        <h2>Componentes</h2>
+        <p>Classes <code>ds-*</code> prontas para uso nas telas do produto.</p>
+        <div class="grid-2">
+          <div class="ds-card stack">
+            <h3>Botões</h3>
+            <div class="row">
+              <button type="button" class="ds-btn ds-btn--primary">Primário</button>
+              <button type="button" class="ds-btn ds-btn--secondary">Secundário</button>
+              <button type="button" class="ds-btn ds-btn--ghost">Discreto</button>
+              <button type="button" class="ds-btn ds-btn--danger">Excluir</button>
+              <button type="button" class="ds-btn ds-btn--primary" disabled>Desabilitado</button>
+            </div>
+          </div>
+
+          <div class="ds-card stack">
+            <h3>Badges</h3>
+            <div class="row">
+              <span class="ds-badge">Padrão</span>
+              <span class="ds-badge ds-badge--brand">Marca</span>
+              <span class="ds-badge ds-badge--success">Ativo</span>
+              <span class="ds-badge ds-badge--warning">Pendente</span>
+              <span class="ds-badge ds-badge--danger">Bloqueado</span>
+            </div>
+          </div>
+
+          <div class="ds-card stack">
+            <h3>Campos</h3>
+            <div class="ds-field">
+              <label class="ds-label" for="ds-demo-name">Nome</label>
+              <input class="ds-input" id="ds-demo-name" type="text" placeholder="Maria Silva" />
+              <span class="ds-hint">Como aparece no seu perfil.</span>
+            </div>
+            <div class="ds-field ds-field--error">
+              <label class="ds-label" for="ds-demo-email">E-mail</label>
+              <input class="ds-input" id="ds-demo-email" type="email" value="maria@" aria-invalid="true" aria-describedby="ds-demo-email-hint" />
+              <span class="ds-hint" id="ds-demo-email-hint">Informe um e-mail válido.</span>
+            </div>
+          </div>
+
+          <div class="ds-card stack">
+            <h3>Alertas</h3>
+            <div class="ds-alert ds-alert--info" role="status">Nova versão disponível.</div>
+            <div class="ds-alert ds-alert--success" role="status">Alterações salvas com sucesso.</div>
+            <div class="ds-alert ds-alert--warning" role="status">Sua sessão expira em 5 minutos.</div>
+            <div class="ds-alert ds-alert--danger" role="alert">Não foi possível concluir a operação.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
