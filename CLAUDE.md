@@ -12,6 +12,8 @@ Repositório desenvolvido por agentes Claude a partir de issues do GitHub.
 - TypeScript (ESM, `strict`) em `src/`; testes com Vitest ao lado do código (`src/**/*.test.ts`).
 - Comandos: `npm test`, `npm run typecheck`, `npm run build`.
 - Funções pequenas e puras quando possível; sem dependências novas sem necessidade.
+- Telas/páginas web vão em `src/pages/` (HTML, CSS, JS e imagens). Tudo nessa pasta, exceto `*.ts`, é publicado
+  automaticamente em https://rodrigosilvacio.github.io/claude-tem/app/ após o merge — use caminhos relativos.
 - Código em inglês; comentários, mensagens de commit e documentação em português.
 
 ## Fora do escopo dos agentes

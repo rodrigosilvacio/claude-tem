@@ -87,6 +87,10 @@ também a cada 15 min. Ele gera um retrato (`board.json`) com os dados do GitHub
 recarrega esses dados a cada 30 s. Nenhum token fica exposto na página. Cada atualização leva cerca de 1 min para
 aparecer, e a página é pública, como o repositório.
 
+### Páginas do produto
+O que os agentes criam em `src/pages/` é publicado em **https://rodrigosilvacio.github.io/claude-tem/app/**
+(há um link no topo do dashboard). A publicação acontece a cada merge na `main`.
+
 ## Dashboard local (opcional)
 Mais detalhado que o Project: mostra o status da execução, os tempos por etapa e o passo a passo de cada demanda.
 ```bash

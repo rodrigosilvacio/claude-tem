@@ -1,6 +1,7 @@
 name: Publicar dashboard
 run-name: "Dashboard (${{ github.event_name }})"
-# Gera board.json com o estado atual das demandas e publica o kanban no GitHub Pages.
+# Publica no GitHub Pages o kanban (raiz, com board.json atualizado) e as páginas do
+# produto desenvolvidas pelos agentes (src/pages/ → /app/).
 
 on:
   issues:
@@ -12,7 +13,7 @@ on:
     types: [in_progress, completed]
   push:
     branches: [main]
-    paths: [dashboard/**]
+    paths: [dashboard/**, src/**]
   schedule:
     - cron: "*/15 * * * *"
   workflow_dispatch:
@@ -62,6 +63,35 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           GITHUB_REPO: ${{ github.repository }}
         run: npm run snapshot -w server -- ../web/dist/board.json
+
+      - name: Copiar páginas do produto (src/pages → /app)
+        working-directory: .
+        run: |
+          out=dashboard/web/dist/app
+          mkdir -p "$out"
+          if [ -d src/pages ]; then
+            # Tudo que é estático; testes e código TypeScript ficam de fora
+            tar -C src/pages --exclude='*.ts' --exclude='*.tsx' -cf - . | tar -C "$out" -xf -
+          fi
+          {
+            echo '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">'
+            echo '<meta name="viewport" content="width=device-width,initial-scale=1"><title>Páginas do produto</title>'
+            echo '<style>body{font:15px/1.5 system-ui,sans-serif;max-width:640px;margin:40px auto;padding:0 16px;color:#1c2026;background:#f5f6f8}'
+            echo 'a{color:#3b5bdb}li{margin:6px 0}@media(prefers-color-scheme:dark){body{color:#e6e8eb;background:#111317}a{color:#748ffc}}</style>'
+            echo '</head><body><p><a href="../">← Kanban dos Agentes</a></p><h1>Páginas do produto</h1><ul>'
+            found=0
+            while IFS= read -r f; do
+              rel="${f#./}"
+              title=$(sed -n 's:.*<title>\(.*\)</title>.*:\1:p' "src/pages/$rel" | head -1)
+              echo "<li><a href=\"$rel\">${title:-$rel}</a> <small><code>src/pages/$rel</code></small></li>"
+              found=1
+            done < <(cd src/pages 2>/dev/null && find . -name '*.html' ! -path './index.html' | sort)
+            [ "$found" = 1 ] || echo '<li>Nenhuma página ainda.</li>'
+            echo '</ul></body></html>'
+          } > "$out/index.html.tmp"
+          # Se o produto tiver o próprio index.html, ele prevalece
+          if [ -f "$out/index.html" ]; then rm "$out/index.html.tmp"; else mv "$out/index.html.tmp" "$out/index.html"; fi
+          ls -R "$out"
 
       - uses: actions/upload-pages-artifact@v3
         with:

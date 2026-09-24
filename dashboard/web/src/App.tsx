@@ -36,6 +36,8 @@ export function App() {
               "carregando…"
             )}
             {" · "}
+            <a href="app/">Ver páginas do produto</a>
+            {" · "}
             {active} {active === 1 ? "agente trabalhando" : "agentes trabalhando"}
           </p>
         </div>
