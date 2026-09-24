@@ -1,0 +1,31 @@
+name: Sincronizar kanban
+run-name: "Kanban #${{ github.event.issue.number }}"
+# Reflete no GitHub Project as labels aplicadas manualmente (ex.: agent:todo).
+# As transições feitas pelos agentes já sincronizam dentro dos próprios workflows.
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  issues: read
+
+jobs:
+  sync:
+    if: startsWith(github.event.label.name, 'agent:') && vars.PROJECT_NUMBER != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts
+      - name: Atualizar coluna no Project
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER }}
+          PROJECT_TOKEN: ${{ secrets.AGENT_PAT }}
+          ISSUE: ${{ github.event.issue.number }}
+        run: |
+          source scripts/agent-state.sh
+          # Usa o estado ATUAL da issue (o Dev pode já ter mudado de etapa)
+          state=$(gh issue view "$ISSUE" --json labels -q '[.labels[].name | select(startswith("agent:"))] | first // empty')
+          [[ -n "$state" ]] && sync_project "$ISSUE" "$state"

@@ -23,6 +23,9 @@ permissions:
 env:
   ISSUE: ${{ github.event.issue.number || inputs.issue_number }}
   BRANCH: claude/issue-${{ github.event.issue.number || inputs.issue_number }}
+  # Kanban no GitHub Project (opcional; ver scripts/setup-project.sh)
+  PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER }}
+  PROJECT_TOKEN: ${{ secrets.AGENT_PAT }}
 
 jobs:
   dev:
