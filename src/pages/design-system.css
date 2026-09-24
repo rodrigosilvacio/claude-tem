@@ -1,0 +1,330 @@
+/*
+ * Design system corporativo — tokens e componentes base.
+ * As variáveis de :root espelham `src/design-system/tokens.ts` (validado nos testes).
+ * Uso: <link rel="stylesheet" href="design-system.css" /> e as classes `ds-*`.
+ */
+
+:root {
+  --color-primary-50: #eff4fb;
+  --color-primary-100: #dbe5f5;
+  --color-primary-200: #b7cbeb;
+  --color-primary-300: #88a8dc;
+  --color-primary-400: #5a82c8;
+  --color-primary-500: #3763b0;
+  --color-primary-600: #264d94;
+  --color-primary-700: #1e3d78;
+  --color-primary-800: #182f5e;
+  --color-primary-900: #0f1f40;
+  --color-accent-50: #effcf9;
+  --color-accent-100: #cff5ec;
+  --color-accent-200: #9febd9;
+  --color-accent-300: #67d9c2;
+  --color-accent-400: #34bfa7;
+  --color-accent-500: #1aa38c;
+  --color-accent-600: #128372;
+  --color-accent-700: #13695d;
+  --color-accent-800: #14544c;
+  --color-accent-900: #134640;
+  --color-neutral-50: #f8fafc;
+  --color-neutral-100: #f1f5f9;
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-300: #cbd5e1;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-500: #64748b;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1e293b;
+  --color-neutral-900: #0f172a;
+  --color-success-50: #f0fdf4;
+  --color-success-100: #dcfce7;
+  --color-success-200: #bbf7d0;
+  --color-success-300: #86efac;
+  --color-success-400: #4ade80;
+  --color-success-500: #22c55e;
+  --color-success-600: #16a34a;
+  --color-success-700: #15803d;
+  --color-success-800: #166534;
+  --color-success-900: #14532d;
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-200: #fde68a;
+  --color-warning-300: #fcd34d;
+  --color-warning-400: #fbbf24;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+  --color-warning-800: #92400e;
+  --color-warning-900: #78350f;
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+  --color-danger-200: #fecaca;
+  --color-danger-300: #fca5a5;
+  --color-danger-400: #f87171;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+  --color-danger-800: #991b1b;
+  --color-danger-900: #7f1d1d;
+  --color-info-50: #f0f9ff;
+  --color-info-100: #e0f2fe;
+  --color-info-200: #bae6fd;
+  --color-info-300: #7dd3fc;
+  --color-info-400: #38bdf8;
+  --color-info-500: #0ea5e9;
+  --color-info-600: #0284c7;
+  --color-info-700: #0369a1;
+  --color-info-800: #075985;
+  --color-info-900: #0c4a6e;
+  --color-bg: var(--color-neutral-50);
+  --color-surface-muted: var(--color-neutral-100);
+  --color-border: var(--color-neutral-300);
+  --color-text: var(--color-neutral-900);
+  --color-text-muted: var(--color-neutral-600);
+  --color-brand: var(--color-primary-700);
+  --color-brand-hover: var(--color-primary-800);
+  --color-brand-subtle: var(--color-primary-50);
+  --color-focus: var(--color-primary-500);
+  --color-accent: var(--color-accent-700);
+  --color-success: var(--color-success-700);
+  --color-success-subtle: var(--color-success-50);
+  --color-warning: var(--color-warning-800);
+  --color-warning-subtle: var(--color-warning-50);
+  --color-danger: var(--color-danger-700);
+  --color-danger-subtle: var(--color-danger-50);
+  --color-info: var(--color-info-800);
+  --color-info-subtle: var(--color-info-50);
+  --color-surface: #ffffff;
+  --font-sans: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.12);
+}
+
+/* Base */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-md);
+  line-height: 1.5;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+a {
+  color: var(--color-brand);
+}
+
+a:hover {
+  color: var(--color-brand-hover);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+/* Botões */
+
+.ds-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: 1.25rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.ds-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ds-btn--primary {
+  color: #ffffff;
+  background: var(--color-brand);
+}
+
+.ds-btn--primary:hover:not(:disabled) {
+  background: var(--color-brand-hover);
+}
+
+.ds-btn--secondary {
+  color: var(--color-brand);
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+.ds-btn--secondary:hover:not(:disabled) {
+  background: var(--color-brand-subtle);
+  border-color: var(--color-primary-300);
+}
+
+.ds-btn--ghost {
+  color: var(--color-brand);
+  background: transparent;
+}
+
+.ds-btn--ghost:hover:not(:disabled) {
+  background: var(--color-brand-subtle);
+}
+
+.ds-btn--danger {
+  color: #ffffff;
+  background: var(--color-danger);
+}
+
+.ds-btn--danger:hover:not(:disabled) {
+  background: var(--color-danger-800);
+}
+
+/* Formulários */
+
+.ds-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.ds-label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.ds-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.ds-input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.ds-input:focus {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 0;
+  border-color: var(--color-focus);
+}
+
+.ds-input[aria-invalid="true"] {
+  border-color: var(--color-danger);
+}
+
+.ds-field--error .ds-hint {
+  color: var(--color-danger);
+}
+
+/* Cartões */
+
+.ds-card {
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Alertas */
+
+.ds-alert {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-sm);
+  border-left: 4px solid currentColor;
+  border-radius: var(--radius-md);
+}
+
+.ds-alert--info {
+  color: var(--color-info);
+  background: var(--color-info-subtle);
+}
+
+.ds-alert--success {
+  color: var(--color-success);
+  background: var(--color-success-subtle);
+}
+
+.ds-alert--warning {
+  color: var(--color-warning);
+  background: var(--color-warning-subtle);
+}
+
+.ds-alert--danger {
+  color: var(--color-danger);
+  background: var(--color-danger-subtle);
+}
+
+/* Badges */
+
+.ds-badge {
+  display: inline-block;
+  padding: 0.125rem var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  background: var(--color-surface-muted);
+}
+
+.ds-badge--brand {
+  color: var(--color-brand);
+  background: var(--color-brand-subtle);
+}
+
+.ds-badge--success {
+  color: var(--color-success);
+  background: var(--color-success-subtle);
+}
+
+.ds-badge--warning {
+  color: var(--color-warning);
+  background: var(--color-warning-subtle);
+}
+
+.ds-badge--danger {
+  color: var(--color-danger);
+  background: var(--color-danger-subtle);
+}
